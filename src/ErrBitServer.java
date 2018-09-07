@@ -79,11 +79,13 @@ public class ErrBitServer {
         String problemTime = obj.getString("last_notice_at");
         String problemMessage = obj.getString("message");
         Integer problemCount = obj.getInt("notices_count");
+        Integer status = obj.getInt("status");
 
         HashMap<String,String> map = new HashMap<>();
         map.put("problemTime", problemTime);
         map.put("problemMessage", problemMessage);
         map.put("problemCount", problemCount.toString());
+        map.put("status", status.toString());
 
         return map;
     }
@@ -93,8 +95,8 @@ public class ErrBitServer {
         HashMap<String,String> map = new HashMap<String,String>();
         map = jsonParse(jsonString);
 
-        if (map.get("problemMessage").contains("502")) sendResult(map);
-        else if (map.get("problemMessage").contains("404")) sendResult(map);
+        if (map.get("status").contains("502")) sendResult(map);
+        else if (map.get("status").contains("404")) sendResult(map);
         else if (parseInt(map.get("problemCount")) <= 20 ) sendResult(map);
     }
 
