@@ -92,12 +92,13 @@ public class ErrBitServer {
 
     private static void analyseString(String jsonString)
     {
-        HashMap<String,String> map = new HashMap<String,String>();
+        HashMap<String,String> map;
         map = jsonParse(jsonString);
 
-        if (map.get("status").contains("502")) sendResult(map);
-        else if (map.get("status").contains("404")) sendResult(map);
-        else if (parseInt(map.get("problemCount")) <= 20 ) sendResult(map);
+        if (map.get("status").contains("502") ||
+            map.get("status").contains("404") ||
+            parseInt(map.get("problemCount")) <= 20)
+                sendResult(map);
     }
 
     private static void sendResult(HashMap<String,String> map)
