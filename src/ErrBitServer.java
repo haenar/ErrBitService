@@ -6,6 +6,7 @@ import telegram.TelegramFlow;
 
 import java.io.*;
 import java.net.InetSocketAddress;
+import java.net.URLDecoder;
 import java.util.HashMap;
 
 import static java.lang.Integer.parseInt;
@@ -74,29 +75,27 @@ public class ErrBitServer {
     }
 
 
-    private static HashMap<String,String> jsonParse (String line){
-        JSONObject obj = new JSONObject(line.replace("problem=", ""));
+    private static HashMap<String,String> jsonParse (String line) throws IOException{
+        line = URLDecoder.decode(line, "UTF-8").replace("problem=", "");
+        JSONObject obj = new JSONObject(line);
         String problemTime = obj.getString("last_notice_at");
         String problemMessage = obj.getString("message");
         Integer problemCount = obj.getInt("notices_count");
-        Integer status = obj.getInt("status");
 
         HashMap<String,String> map = new HashMap<>();
         map.put("problemTime", problemTime);
         map.put("problemMessage", problemMessage);
         map.put("problemCount", problemCount.toString());
-        map.put("status", status.toString());
 
         return map;
     }
 
-    private static void analyseString(String jsonString)
-    {
+    private static void analyseString(String jsonString)throws IOException {
         HashMap<String,String> map;
         map = jsonParse(jsonString);
 
-        if (map.get("status").contains("502") ||
-            map.get("status").contains("404") ||
+        if (map.get("problemMessage").contains("502") ||
+            map.get("problemMessage").contains("404") ||
             parseInt(map.get("problemCount")) <= 20)
                 sendResult(map);
     }
