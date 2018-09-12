@@ -2,8 +2,8 @@ FROM openjdk:10.0.2-13-jdk-sid as build
 
 
 
-COPY ./ErrBitServer.jar ~/
+COPY ./errbitserver.ErrBitServer.jar ~/
 
 
 
-CMD ["java", "-jar",  "~/ErrBitServer.jar"]
+CMD ["java", "-jar",  "~/errbitserver.ErrBitServer.jar"]
