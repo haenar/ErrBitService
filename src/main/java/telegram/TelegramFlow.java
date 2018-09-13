@@ -15,7 +15,7 @@ public class TelegramFlow {
         try {
 
             String url = format("https://api.telegram.org/bot643973718:AAFdUtXmpAVxpXADEHM8PSdNOdL7OZug9OQ/sendMessage?chat_id=-317464695&parse_mode=Markdown&text=%s",
-                    text.replace("\n",". "));
+                    text);
 
             Authenticator.setDefault(new Authenticator(){
                 protected PasswordAuthentication getPasswordAuthentication(){
