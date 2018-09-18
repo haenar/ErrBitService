@@ -126,7 +126,8 @@ public class ErrBitServer {
         if ((map.get("problemMessage").contains("502") ||
                 map.get("problemMessage").contains("404") ||
                 parseInt(map.get("problemCount")) <= 20) &&
-                !map.get("problemMessage").contains("422"))
+                !map.get("problemMessage").contains("422") ||
+                !map.get("problemMessage").contains("403"))
             sendResult(map);
     }
 
@@ -153,7 +154,7 @@ public class ErrBitServer {
         String telegram = "\uD83D\uDE40*[ERRBIT-ACHTUNG]* Frontend-production" +
                 "%0A`Время:` " + map.get("problemTime") +
                 "%0A`Количество ошибок:` " + map.get("problemCount") +
-                "%0A`Проблема:` " + map.get("problemMessage") +
+                "%0A`Проблема:` " + map.get("problemMessage").replace("(", "/").replace(")", "/") +
                 jiraTicket;
 
         TelegramFlow t = new TelegramFlow();
