@@ -5,7 +5,6 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import jira.MyJiraClientFlow;
 import json.JSONObject;
-import org.apache.http.HttpException;
 import telegram.TelegramFlow;
 
 import java.io.*;
@@ -123,12 +122,16 @@ public class ErrBitServer {
     private static void analyseString(String jsonString) throws IOException {
         HashMap<String, String> map;
         map = jsonParse(jsonString);
-        if ((map.get("problemMessage").contains("502") ||
-                map.get("problemMessage").contains("404") ||
-                parseInt(map.get("problemCount")) <= 20) &&
-                !map.get("problemMessage").contains("422") ||
-                !map.get("problemMessage").contains("403"))
-            sendResult(map);
+
+        if ( map.get("problemMessage").contains("502") ||
+             map.get("problemMessage").contains("404") ||
+             parseInt(map.get("problemCount")) <= 20) {
+
+            if (    !map.get("problemMessage").contains("422") &&
+                    !map.get("problemMessage").contains("403")) {
+                    sendResult(map);
+            }
+        }
     }
 
     private static void sendResult(HashMap<String, String> map) throws IOException {
@@ -146,7 +149,12 @@ public class ErrBitServer {
             jiraTicket = "%0A`Jira ticket:` " + jiraTicket.split(",")[1].split("\"")[3];
             jiraTicket = "%0A" + format("[%s](https://jjunglejobs.atlassian.net/browse/%s)", jiraTicket, jiraTicket);
         } else {
-            String url = format("%snewticket?%s", HOST, jira.replace("\\n", "|").replace(": ", "="));
+            String url = format("%snewticket?%s", HOST, jira
+                    .replace("\\n", "|")
+                    .replace(": ", "=")
+                    .replace("(", "|")
+                    .replace(")", "|"));
+
             jiraTicket = "%0A" + format("[Создать тикет](%s)", url);
         }
 
@@ -154,7 +162,7 @@ public class ErrBitServer {
         String telegram = "\uD83D\uDE40*[ERRBIT-ACHTUNG]* Frontend-production" +
                 "%0A`Время:` " + map.get("problemTime") +
                 "%0A`Количество ошибок:` " + map.get("problemCount") +
-                "%0A`Проблема:` " + map.get("problemMessage").replace("(", "/").replace(")", "/") +
+                "%0A`Проблема:` " + map.get("problemMessage").replace("(", "|").replace(")", "|") +
                 jiraTicket;
 
         TelegramFlow t = new TelegramFlow();
