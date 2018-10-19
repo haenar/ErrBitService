@@ -7,10 +7,15 @@ import jira.MyJiraClientFlow;
 import json.JSONObject;
 import telegram.TelegramFlow;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
+import java.sql.*;
 import java.util.HashMap;
+import java.util.List;
 
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
@@ -24,6 +29,8 @@ public class ErrBitServer {
     private static final String HOST = "http://stage.junglejobs.ru:1111/";
 
     public static void main(String[] args) throws Exception {
+        sqlResult();
+
         HttpServer server = HttpServer.create(new InetSocketAddress(1111), 5);
         server.createContext("/work", new MyHandler());
         server.createContext("/start", new MyHandlerStart());
@@ -35,17 +42,20 @@ public class ErrBitServer {
         server.start();
     }
 
+    private static  void sqlResult() {
+    }
+
     static class MyHandler implements HttpHandler {
-        public void handle(HttpExchange t) throws IOException {
-                if (serviceIsON) {
+        public void handle(HttpExchange t) throws IOException{
+                if (!serviceIsON) {
                     BufferedReader br = new BufferedReader(new InputStreamReader(t.getRequestBody()));
-                    analyseString(br.readLine());
+                    /*analyseString(br.readLine());
                     br.close();
                     serverResponse("Telegram sending - OK", t);
-                    if (jiraTicketON) serverResponse("Jira ticket creation - OK", t);
+                    if (jiraTicketON) serverResponse("Jira ticket creation - OK", t);*/
+                    analyseString(br.readLine());
                 } else
                     serverResponse("Service is OFF", t);
-
 
         }
     }
@@ -95,15 +105,13 @@ public class ErrBitServer {
         }
     }
 
-
     private static void serverResponse(String s, HttpExchange t) throws IOException {
         t.sendResponseHeaders(200, s.length());
         OutputStream os = t.getResponseBody();
         os.write(s.getBytes());
         os.close();
     }
-
-
+    
     private static HashMap<String, String> jsonParse(String line) throws IOException {
         line = URLDecoder.decode(line, "UTF-8").replace("problem=", "");
         JSONObject obj = new JSONObject(line);
@@ -118,19 +126,65 @@ public class ErrBitServer {
 
         return map;
     }
-
     private static void analyseString(String jsonString) throws IOException {
+        jsonString = URLDecoder.decode(jsonString, "UTF-8").replace("problem=", "");
         HashMap<String, String> map;
         map = jsonParse(jsonString);
 
         if ( map.get("problemMessage").contains("502") ||
-             map.get("problemMessage").contains("404") ||
-             parseInt(map.get("problemCount")) <= 20) {
+                map.get("problemMessage").contains("404") ||
+                parseInt(map.get("problemCount")) <= 2000) {
 
-            if (    !map.get("problemMessage").contains("422") &&
-                    !map.get("problemMessage").contains("403")) {
-                    sendResult(map);
-            }
+            String s1 = map.get("problemMessage");
+            Connection connection = null;
+
+
+
+                if (    !map.get("problemMessage").contains("422") &&
+                        !map.get("problemMessage").contains("403")
+
+                ) {
+
+                    try {
+                        connection = DriverManager.getConnection(
+                                "jdbc:postgresql://194.177.20.19:5432/QA_DB",
+                                "postgres", "");
+                        Statement statement = connection.createStatement();
+
+                        ResultSet result1 = statement.executeQuery(
+                                "SELECT * FROM errbit_ahtung");
+                        int count = 0;
+                        while (result1.next()) {
+                            count++;
+                        }
+
+                        result1.beforeFirst();
+                        String[] a = new String[count];
+                        int i = 0;
+                        while (result1.next()) {
+                            a[i] = result1.getString(4);
+                            i++;
+                        }
+                        boolean result = false;
+                        for (int j = 0; j < a.length; j++) {
+                            String[] b = a[j].split("¶");
+                            int countSubString = 0;
+                            for (int m = 0; m < b.length; m++) {
+                                if (s1.contains(b[m])) {
+                                    countSubString++;
+                                }
+                            }
+                            if (countSubString == b.length) {
+                                result = true;
+                                break;
+                            }
+                        }
+                         sendResult(map);
+
+                    } catch (Exception ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                }
         }
     }
 
@@ -157,7 +211,6 @@ public class ErrBitServer {
 
             jiraTicket = "%0A" + format("[Создать тикет](%s)", url);
         }
-
 
         String telegram = "\uD83D\uDE40*[ERRBIT-ACHTUNG]* Frontend-production" +
                 "%0A`Время:` " + map.get("problemTime") +

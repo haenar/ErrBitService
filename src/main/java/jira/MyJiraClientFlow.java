@@ -5,7 +5,8 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
+
+import com.sun.jersey.core.util.Base64;
 import org.mortbay.util.MultiPartWriter;
 
 import java.io.*;
