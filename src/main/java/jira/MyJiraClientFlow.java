@@ -19,7 +19,7 @@ public class MyJiraClientFlow {
     String password = "Bezenchuk01";
     String jiraUrl = "https://jjunglejobs.atlassian.net";
 
-    public String jiraCreateIssue(String summary, String description, String assignee) throws  IOException{
+    public String jiraCreateIssue(String summary, String description, String assignee){
         String result = "";
 
         ClientConfig cc = new DefaultClientConfig();
@@ -37,8 +37,11 @@ public class MyJiraClientFlow {
         ClientResponse response = webResource.header("Authorization", "Basic " + auth).type("application/json").accept("application/json").post(ClientResponse.class, data);
         BufferedReader inputStream = new BufferedReader(new InputStreamReader(response.getEntityInputStream()));
         String line;
-        while ((line = inputStream.readLine()) != null)
-            result = line;
+
+        try {
+            while ((line = inputStream.readLine()) != null)
+                result = line;
+        } catch (Exception ex) {}
 
         return result;
     }

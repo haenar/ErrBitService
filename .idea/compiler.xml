@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="ErrBitServer" target="1.6" />
+      <module name="ErrBitServer" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>

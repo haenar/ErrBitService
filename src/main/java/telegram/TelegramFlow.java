@@ -12,11 +12,9 @@ public class TelegramFlow {
     String PASS="J$ngl1Bells";
 
     public void messageSend(String text){
+        String url = format("https://api.telegram.org/bot643973718:AAFdUtXmpAVxpXADEHM8PSdNOdL7OZug9OQ/sendMessage?chat_id=-317464695&parse_mode=Markdown&text=%s",
+                text);
         try {
-
-            String url = format("https://api.telegram.org/bot643973718:AAFdUtXmpAVxpXADEHM8PSdNOdL7OZug9OQ/sendMessage?chat_id=-317464695&parse_mode=Markdown&text=%s",
-                    text);
-
             Authenticator.setDefault(new Authenticator(){
                 protected PasswordAuthentication getPasswordAuthentication(){
                     PasswordAuthentication p = new PasswordAuthentication(USER, PASS.toCharArray());
@@ -29,10 +27,9 @@ public class TelegramFlow {
             connection.connect();
             connection.getResponseMessage();
             connection.disconnect();
-
         }
-        catch (IOException e) {
-
+        catch (IOException ex) {
+            System.out.println("Telegram messageSend - " + ex.getMessage() + " " + url);
         }
     }
 }
