@@ -28,7 +28,7 @@ public class MyJiraClientFlow {
 
         WebResource webResource = client.resource(jiraUrl + "/rest/api/latest/issue");
 
-        String data = "{\"fields\":{\"project\":{\"key\":\"EBS\"},\"summary\":\""
+        String data = "{\"fields\":{\"project\":{\"key\":\"SUP\"},\"summary\":\""
                 + summary + "\",\"description\": \""
                 + description + "\",\"assignee\":{\"name\":\""
                 + assignee + "\"},\"labels\":[\"support\"],\"issuetype\":{\"name\":\"Bug\"}}}";

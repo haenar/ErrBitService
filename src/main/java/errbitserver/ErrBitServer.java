@@ -20,7 +20,7 @@ public class ErrBitServer {
 
     private static boolean serviceIsON = false;
     private static boolean jiraTicketON = false;
-    private static String version = "3.03";
+    private static String version = "3.04";
     private static final String HOST = "http://194.177.20.19:1111/";
     private static Queue<List<String[]>> queue = new LinkedList<List<String[]>>();
 
