@@ -20,8 +20,8 @@ public class ErrBitServer {
 
     private static boolean serviceIsON = false;
     private static boolean jiraTicketON = false;
-    private static String version = "3.04";
-    private static final String HOST = "http://194.177.20.19:1111/";
+    private static String version = "3.05";
+    private static final String HOST = "http://213.232.228.186:1111/";
     private static Queue<List<String[]>> queue = new LinkedList<List<String[]>>();
 
 
@@ -49,7 +49,7 @@ public class ErrBitServer {
                         serverResponse("Telegram sending - OK", t);
                         if (jiraTicketON) serverResponse("Jira ticket creation - OK", t);
                     }
-                    serverResponse("Telegram sending - NOK", t);
+                    else serverResponse("Telegram sending - NOK", t);
                 } else
                     serverResponse("Service is OFF", t);
 

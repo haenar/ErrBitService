@@ -1,4 +1,4 @@
 errbitserver:
   image: errbitserver
   ports: 
-    - "8080:1111"
+    - "1111:1111"

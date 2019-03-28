@@ -16,7 +16,7 @@ import java.lang.String;
 public class MyJiraClientFlow {
 
     String username = "a.vershinin@junglejobs.ru";
-    String password = "Bezenchuk01";
+    String password = "sumsung_000";
     String jiraUrl = "https://jjunglejobs.atlassian.net";
 
     public String jiraCreateIssue(String summary, String description, String assignee){

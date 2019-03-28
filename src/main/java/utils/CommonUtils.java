@@ -51,7 +51,7 @@ public class CommonUtils {
                 for (String[] s : l) {
                     LocalDateTime dateFromBack = LocalDateTime.parse(s[0], formatter);
                     Duration duration = Duration.between(dateFromFront, dateFromBack);
-                    if (duration.toMillis() <= 500 && duration.toMillis() >= -500)
+                    if (duration.toMillis() <= 800 && duration.toMillis() >= -800)
                         return s[1].replace("example.com", "junglejobs.ru");
                 }
             }

@@ -10,7 +10,7 @@ public class SqlOperations {
     public static Boolean checkThatMessageIsFiltered (String text) {
         try {
             Connection connection = DriverManager.getConnection(
-                    "jdbc:postgresql://194.177.20.19:5432/QA_DB",
+                    "jdbc:postgresql://213.232.228.186:5432/qa_db",
                     "postgres", "");
 
             Statement statement = connection.createStatement();
@@ -23,7 +23,7 @@ public class SqlOperations {
                     if (text.contains(subStrings[m]))
                         countSubString++;
                 }
-                if (countSubString == subStrings.length) {
+                if (countSubString == subStrings.length && countSubString != 0) {
                     return false;
                 }
             }
