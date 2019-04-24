@@ -20,9 +20,10 @@ public class ErrBitServer {
 
     private static boolean serviceIsON = false;
     private static boolean jiraTicketON = false;
-    private static String version = "3.05";
+    private static String version = "3.06";
     private static final String HOST = "http://213.232.228.186:1111/";
     private static Queue<List<String[]>> queue = new LinkedList<List<String[]>>();
+    private static String assignee = "n.kozlov";
 
 
     public static void main(String[] args) throws Exception {
@@ -45,7 +46,7 @@ public class ErrBitServer {
                     HashMap<String, String> map = jsonParse(br.readLine());
                     br.close();
                     if (errorMessageFilter(map)){
-                        sendResult(map, jiraTicketON, HOST, queueSynchronize(map, queue));
+                        sendResult(map, jiraTicketON, HOST, queueSynchronize(map, queue), assignee);
                         serverResponse("Telegram sending - OK", t);
                         if (jiraTicketON) serverResponse("Jira ticket creation - OK", t);
                     }
@@ -110,7 +111,7 @@ public class ErrBitServer {
                 jiraText = jiraText.split("\\?")[1].replace("|", "\\n").replace("=", ": ");
 
                 MyJiraClientFlow j = new MyJiraClientFlow();
-                String jiraTicket = j.jiraCreateIssue("JungleJobs - Frontend-production", jiraText, "a.khivin");
+                String jiraTicket = j.jiraCreateIssue(jiraText, assignee);
 
                 jiraTicket = "https://jjunglejobs.atlassian.net/browse/" + jiraTicket.split(",")[1].split("\"")[3];
                 serverResponse(format("<html><body><script type=\"text/javascript\">window.location.replace('%s')</script><body></html>", jiraTicket), t);

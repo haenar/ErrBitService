@@ -97,7 +97,7 @@ public class CommonUtils {
         return false;
     }
 
-    public static void sendResult(HashMap<String, String> map, Boolean jiraTicketON, String host, String urlErrorFromErrbitBackEnd) {
+    public static void sendResult(HashMap<String, String> map, Boolean jiraTicketON, String host, String urlErrorFromErrbitBackEnd, String assignee) {
         String jira = "Время: " + map.get("problemTime") +
                 "\\n" + "Количество ошибок: " + map.get("problemCount") +
                 "\\n" + "Проблема: " + map.get("problemMessage")
@@ -109,7 +109,7 @@ public class CommonUtils {
         String jiraTicket = null;
         if (jiraTicketON) {
             MyJiraClientFlow j = new MyJiraClientFlow();
-            jiraTicket = j.jiraCreateIssue("JungleJobs - Frontend-production", jira, "a.khivin");
+            jiraTicket = j.jiraCreateIssue(jira, assignee);
             jiraTicket = "%0A`Jira ticket:` " + jiraTicket.split(",")[1].split("\"")[3];
             jiraTicket = "%0A" + format("[%s](https://jjunglejobs.atlassian.net/browse/%s)", jiraTicket, jiraTicket);
         } else {
