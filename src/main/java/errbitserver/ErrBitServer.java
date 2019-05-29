@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Queue;
 
 import static java.lang.String.format;
+import static telegram.SlackFlow.sendResulttoSlack;
+import static telegram.TelegramFlow.*;
+import telegram.SlackFlow.*;
 import static utils.CommonUtils.*;
 
 
@@ -20,11 +23,11 @@ public class ErrBitServer {
 
     private static boolean serviceIsON = false;
     private static boolean jiraTicketON = false;
-    private static String version = "3.06";
+    private static String version = "4.03";
     private static final String HOST = "http://213.232.228.186:1111/";
     private static Queue<List<String[]>> queue = new LinkedList<List<String[]>>();
-    private static String assignee = "n.kozlov";
-
+    private static String assigneeJJ = "n.kozlov";
+    private static String assigneeSever = "a.stefanenkov";
 
     public static void main(String[] args) throws Exception {
         HttpServer server = HttpServer.create(new InetSocketAddress(1111), 5);
@@ -45,12 +48,16 @@ public class ErrBitServer {
                     BufferedReader br = new BufferedReader(new InputStreamReader(t.getRequestBody()));
                     HashMap<String, String> map = jsonParse(br.readLine());
                     br.close();
+
                     if (errorMessageFilter(map)){
-                        sendResult(map, jiraTicketON, HOST, queueSynchronize(map, queue), assignee);
-                        serverResponse("Telegram sending - OK", t);
+                        if (map.get("appName").toLowerCase().contains("jordan"))
+                            sendResulttoTelegram(map, jiraTicketON, HOST, queueSynchronize(map, queue), assigneeJJ);
+                        else
+                            sendResulttoSlack(map, jiraTicketON, HOST, queueSynchronize(map, queue), assigneeSever);
+                        serverResponse("Message sending - OK", t);
                         if (jiraTicketON) serverResponse("Jira ticket creation - OK", t);
                     }
-                    else serverResponse("Telegram sending - NOK", t);
+                    else serverResponse("Message sending - NOK", t);
                 } else
                     serverResponse("Service is OFF", t);
 
@@ -64,7 +71,12 @@ public class ErrBitServer {
                 BufferedReader br = new BufferedReader(new InputStreamReader(t.getRequestBody()));
                 HashMap<String, String> map = jsonParse(br.readLine());
                 br.close();
-                queue = workWithQueue(map, queue);
+                if (map.get("appName").toLowerCase().contains("sever-backend-prod")) {
+                    if (errorMessageFilter(map))
+                        sendResulttoSlack(map, jiraTicketON, HOST, queueSynchronize(map, null), assigneeSever);
+                }
+                else
+                    queue = workWithQueue(map, queue);
                 serverResponse("Server Response - OK", t);
             } else
                 serverResponse("Service is OFF", t);
@@ -111,7 +123,7 @@ public class ErrBitServer {
                 jiraText = jiraText.split("\\?")[1].replace("|", "\\n").replace("=", ": ");
 
                 MyJiraClientFlow j = new MyJiraClientFlow();
-                String jiraTicket = j.jiraCreateIssue(jiraText, assignee);
+                String jiraTicket = j.jiraCreateIssue(jiraText, assigneeJJ, "New Ticket Creation From Errbit-Achtung Service");
 
                 jiraTicket = "https://jjunglejobs.atlassian.net/browse/" + jiraTicket.split(",")[1].split("\"")[3];
                 serverResponse(format("<html><body><script type=\"text/javascript\">window.location.replace('%s')</script><body></html>", jiraTicket), t);

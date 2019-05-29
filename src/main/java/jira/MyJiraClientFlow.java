@@ -17,10 +17,12 @@ public class MyJiraClientFlow {
     String token = "YS52ZXJzaGluaW5AanVuZ2xlam9icy5ydTplT2UzOW5hWk93aHQ4dUJucmJldjk4ODg=";
     String jiraUrl = "https://jjunglejobs.atlassian.net";
 
-    public String jiraCreateIssue(String description, String assignee){
+    public String jiraCreateIssue(String description, String assignee, String title){
         String result = "";
 
-        String summary = "JungleJobs - Frontend-production. " + description.split("message:")[1].split("Ошибка")[0];
+        String summary = title + ". " + description.split("message:")[1]
+                                                                            .split("Ошибка")[0]
+                                                                            .split(";")[0];
 
         ClientConfig cc = new DefaultClientConfig();
         cc.getClasses().add(MultiPartWriter.class);

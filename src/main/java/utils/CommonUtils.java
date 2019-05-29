@@ -1,14 +1,12 @@
 package utils;
 
 import com.sun.net.httpserver.HttpExchange;
-import jira.MyJiraClientFlow;
 import json.JSONObject;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.Duration;
 import sql.SqlOperations;
-import telegram.TelegramFlow;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -17,7 +15,6 @@ import java.net.URLDecoder;
 import java.util.*;
 
 import static java.lang.Integer.parseInt;
-import static java.lang.String.format;
 import static java.lang.Thread.sleep;
 
 
@@ -52,14 +49,14 @@ public class CommonUtils {
                     LocalDateTime dateFromBack = LocalDateTime.parse(s[0], formatter);
                     Duration duration = Duration.between(dateFromFront, dateFromBack);
                     if (duration.toMillis() <= 800 && duration.toMillis() >= -800)
-                        return s[1].replace("example.com", "junglejobs.ru");
+                        return s[1];
                 }
             }
         } catch (Exception ex) {
             System.out.println("queueSynchronize - " + ex.getMessage());
         }
 
-        return "";
+        return "-";
     }
 
 
@@ -68,8 +65,9 @@ public class CommonUtils {
         JSONObject obj = new JSONObject(line);
         String problemTime = obj.getString("last_notice_at");
         String problemMessage = obj.getString("message");
-        String url = obj.getString("url");
+        String url = obj.getString("url").replace("example.com", "junglejobs.ru");
         String appName = obj.getString("app_name");
+        String environment = obj.getString("environment");
         Integer problemCount = obj.getInt("notices_count");
 
         HashMap<String, String> map = new HashMap<String, String>();
@@ -77,6 +75,7 @@ public class CommonUtils {
         map.put("problemMessage", problemMessage);
         map.put("problemCount", problemCount.toString());
         map.put("url", url);
+        map.put("environment", environment);
         map.put("appName", appName);
 
         return map;
@@ -97,46 +96,6 @@ public class CommonUtils {
         return false;
     }
 
-    public static void sendResult(HashMap<String, String> map, Boolean jiraTicketON, String host, String urlErrorFromErrbitBackEnd, String assignee) {
-        String jira = "Время: " + map.get("problemTime") +
-                "\\n" + "Количество ошибок: " + map.get("problemCount") +
-                "\\n" + "Проблема: " + map.get("problemMessage")
-                .replace("{", "")
-                .replace("}", "")
-                .replace("\"", "") +
-                "\\n" + "Ошибка backend: " + urlErrorFromErrbitBackEnd;
 
-        String jiraTicket = null;
-        if (jiraTicketON) {
-            MyJiraClientFlow j = new MyJiraClientFlow();
-            jiraTicket = j.jiraCreateIssue(jira, assignee);
-            jiraTicket = "%0A`Jira ticket:` " + jiraTicket.split(",")[1].split("\"")[3];
-            jiraTicket = "%0A" + format("[%s](https://jjunglejobs.atlassian.net/browse/%s)", jiraTicket, jiraTicket);
-        } else {
-            String url = format("%snewticket?%s", host, jira
-                    .replace("\\n", "|")
-                    .replace(": ", "=")
-                    .replace("(", "|")
-                    .replace(")", "|"));
-
-            jiraTicket = "%0A" + format("[Создать тикет](%s)", url);
-        }
-
-
-        String telegram = "\uD83D\uDE40*[ERRBIT-ACHTUNG]* " + map.get("appName").toUpperCase() +
-                "%0A`Время:` " + map.get("problemTime") +
-                "%0A`Количество ошибок:` " + map.get("problemCount") +
-                "%0A`Проблема:` " + map.get("problemMessage")
-                            .replace("(", "|")
-                            .replace(")", "|")
-                            .replace("[", "‖")
-                            .replace("]", "‖") +
-
-                "%0A`Ошибка backend:` [ссылка](" + urlErrorFromErrbitBackEnd + ")" +
-                jiraTicket;
-
-        TelegramFlow t = new TelegramFlow();
-        t.messageSend(telegram);
-    }
 
 }
