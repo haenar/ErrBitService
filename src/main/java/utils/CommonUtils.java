@@ -87,8 +87,9 @@ public class CommonUtils {
                 map.get("problemMessage").contains("\"status\":403"))
             return false;
 
-        if (map.get("problemMessage").contains("\"status\":502") ||
-                map.get("problemMessage").contains("\"status\":404") ||
+        if (map.get("problemMessage").contains("\"status\":500") ||
+            map.get("problemMessage").contains("\"status\":502") ||
+            map.get("problemMessage").contains("\"status\":404") ||
                 parseInt(map.get("problemCount")) <= 20) {
             return SqlOperations.checkThatMessageIsFiltered(map.get("problemMessage"));
         }
