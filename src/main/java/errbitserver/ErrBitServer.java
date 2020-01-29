@@ -23,7 +23,7 @@ public class ErrBitServer {
 
     private static boolean serviceIsON = false;
     private static boolean jiraTicketON = false;
-    private static String version = "4.03";
+    private static String version = "4.04";
     private static final String HOST = "http://213.232.228.186:1111/";
     private static Queue<List<String[]>> queue = new LinkedList<List<String[]>>();
     private static String assigneeJJ = "n.kozlov";
@@ -50,7 +50,7 @@ public class ErrBitServer {
                     br.close();
 
                     if (errorMessageFilter(map)){
-                        if (map.get("appName").toLowerCase().contains("jordan"))
+                        if (map.get("appName").toLowerCase().contains("jj prod"))
                             sendResulttoTelegram(map, jiraTicketON, HOST, queueSynchronize(map, queue), assigneeJJ);
                         else
                             sendResulttoSlack(map, jiraTicketON, HOST, queueSynchronize(map, queue), assigneeSever);
