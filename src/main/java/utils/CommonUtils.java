@@ -40,13 +40,13 @@ public class CommonUtils {
 
     public static String queueSynchronize (HashMap<String, String> map, Queue<List<String[]>> queue) {
         String date = map.get("problemTime");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
         try {
-            LocalDateTime dateFromFront = LocalDateTime.parse(date, formatter);
+            LocalDateTime dateFromFront = LocalDateTime.parse(date.split(" ")[0], formatter);
             sleep(2000);
             for (List<String[]> l : queue) {
                 for (String[] s : l) {
-                    LocalDateTime dateFromBack = LocalDateTime.parse(s[0], formatter);
+                    LocalDateTime dateFromBack = LocalDateTime.parse(s[0].split(" ")[0], formatter);
                     Duration duration = Duration.between(dateFromFront, dateFromBack);
                     if (duration.toMillis() <= 800 && duration.toMillis() >= -800)
                         return s[1];
@@ -61,14 +61,15 @@ public class CommonUtils {
 
 
     public static HashMap<String, String> jsonParse(String line) throws IOException {
-        line = URLDecoder.decode(line, "UTF-8").replace("problem=", "");
+        line = URLDecoder.decode(line, "UTF-8");
         JSONObject obj = new JSONObject(line);
-        String problemTime = obj.getString("last_notice_at");
-        String problemMessage = obj.getString("message");
-        String url = obj.getString("url").replace("example.com", "junglejobs.ru");
-        String appName = obj.getString("app_name");
-        String environment = obj.getString("environment");
-        Integer problemCount = obj.getInt("notices_count");
+        JSONObject problem = obj.getJSONObject("problem");
+        String problemTime = problem.getString("last_notice_at");
+        String problemMessage = problem.getString("message");
+        String url = problem.getString("url").replace("example.com", "junglejobs.ru");
+        String appName = problem.getString("app_name");
+        String environment = problem.getString("environment");
+        Integer problemCount = problem.getInt("notices_count");
 
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("problemTime", problemTime);
