@@ -15,7 +15,7 @@ import static java.lang.String.format;
 public class SlackFlow {
 
     public static boolean sendResulttoSlack(HashMap<String, String> map, Boolean jiraTicketON, String host, String urlErrorFromErrbitBackEnd, String assignee) {
-        String url = "https://hooks.slack.com/services/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";
+        String url = "https://hooks.slack.com/services/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";
         String requestJson = "";
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
